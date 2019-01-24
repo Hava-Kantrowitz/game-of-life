@@ -1,8 +1,8 @@
 /*
  ============================================================================
  Name        : HW2.c
- Author      : 
- Version     :
+ Author      : Hava Kantrowitz
+ Version     : Jan 24, 2019
  Copyright   : Your copyright notice
  Description : Homework 2 Starter Code
  ============================================================================

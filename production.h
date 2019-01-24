@@ -1,8 +1,8 @@
 /*
  * production.h
  *
- *  Created on: Nov 3, 2018
- *      Author: student
+ *  Created on: Jan 24, 2019
+ *      Author: Hava Kantrowitz
  */
 
 #ifndef PRODUCTION_H_

@@ -1,8 +1,8 @@
 /*
  * tests.c
  *
- *  Created on: Nov 3, 2018
- *      Author: student
+ *  Created on: Jan 24, 2019
+ *      Author: Hava Kantrowitz
  */
 #include <stdbool.h>
 #include "tests.h"
