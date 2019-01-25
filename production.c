@@ -23,7 +23,8 @@ bool production(int argc, char* argv[])
 	bool done = false;
 	int nRows=-1;
 	int nCols = -1;
-	int gens = 0; //number of generations to play
+	int gens = -1; //number of generations to play
+	int pause = -1;
 	//etc.
 	//get the NR NC gens input [print] [pause], Usage as needed.
 
@@ -33,7 +34,7 @@ bool production(int argc, char* argv[])
 	// Next, check if print and pause are on the command line
 	if(argc<7)
 	{//must be that pause is not included, so give it a default value
-
+		pause = 0;
 	}
 	else
 	{
@@ -49,6 +50,37 @@ bool production(int argc, char* argv[])
 	return results;
 
 }
+
+/**
+ * populates an array with 'o'
+ * @param nRows number of rows in array
+ * @param nCols number of columns in array
+ * @param zeroArray array to populate with 'o'
+ */
+void fillBaseArray(int nRows, int nCols, char zeroArray[nRows][nCols]){
+	for (int i = 0; i < nRows; i++){
+		for (int j = 0; j < nCols; j++){
+			zeroArray[i][j] = 'o';
+		}
+	}
+}
+
+/**
+ * reads from file and creates populated array
+ * @param nRows number of rows
+ * @param nCols number of columns
+ * @param boardArray board to populate
+ * @param fileName name of input file
+ */
+void scanFile(int nRows, int nCols, char boardArray[nRows][nCols], char* fileName){
+	FILE file = fopen(fileName);
+	for (int i = 0; i < nRows; i++){
+		for (int j = 0; j < nCols; j++){
+
+		}
+	}
+}
+
 /**
  * Plays one generation of life
  * @param nr number of rows on board
@@ -57,16 +89,29 @@ bool production(int argc, char* argv[])
  * @param New changed array
  * @return void
  */
-void PlayOne (unsigned int nr, unsigned int nc, char Old[][nc], char New[][nc])
+void PlayOne (unsigned int nr, unsigned int nc, char Old[][nc], char New[][nc], int maxGen)
 {
 	int nRows = nr;
 	int nCols = nc;
+	char Spare[nr][nc];
+	int currentGen = 0;
 	for(int row = 0;row < nRows;row++)
 	{
 		for(int col=0; col < nCols; col++)
 		{
 			*( ((char*) New) + (row * nCols) + col) = *( ((char*) Old) + (row * nCols) + col);
+			currentGen++;
 		}
+	}
+
+	if (endgame(nr, nc, Spare, Old, New, currentGen, maxGen)){
+		//code to print out final board config
+	}
+	else {
+		//set current new to old
+		//set current old to spare
+		//get rid of spare
+		PlayOne(nRows, nCols, Old, New, maxGen);
 	}
 }
 
@@ -168,14 +213,53 @@ int numNeighbors(int row, int col, char array[][col], int totalR, int totalC){
 }
 
 /**
+ * determines if the board is empty
+ * @param nRows numner of rows in array
+ * @param nCols number of columns in array
+ * @param testArray array to test for emptiness
+ * @return 1 if array is empty, 0 if array has at least one square populated
+ */
+int emptyBoard(int nRows, int nCols, char testArray[][nCols]){
+	int empty = 1;
+	for(int row = 0; row < nRows; row++){
+		for (int col = 0; col < nCols; col++){
+			if (numNeighbors(row, col, testArray, nRows, nCols) > 0){
+				empty = 0;
+			}
+		}
+	}
+
+	return empty;
+}
+
+/**
  * determines if ending conditions are met
  * @param nRows number of rows in array
  * @param nCols number of columns in array
+ * @param twoPreviousArray array created two generations before
  * @param previousArray the array from the generation before
  * @param nowArray the array created in the current generation
- * @return 1 if terminating conditions are met, 0 if terminating conditions aren't met
+ * @return 0 if terminating conditions aren't met
+ * 			1 if terminating condition of repeated pattern is reached
+ * 			2 if maximum number of generations is reached
+ * 			3 if all cells on board are unoccupied
  */
-int endGame(int nRows, int nCols, char previousArray[][nCols], char nowArray[][nCols]){
-	//code
+int endGame(int nRows, int nCols, char twoPreviousArray[][nCols], char previousArray[][nCols], char nowArray[][nCols],
+			int numGens, int maxGens){
+	int finish = 0;
+	if (arrayComparison(nRows, nCols, previousArray, nowArray)){
+		finish = 1;
+	}
+	else if (arrayComparison(nRows, nCols, twoPreviousArray, nowArray)){
+		finish = 1;
+	}
+	else if (numGens == maxGens){
+		finish = 2;
+	}
+	else if (emptyBoard(nRows, nCols, nowArray)){
+		finish = 3;
+	}
+
+	return finish;
 }
 
