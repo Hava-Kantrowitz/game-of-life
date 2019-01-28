@@ -73,10 +73,9 @@ void fillBaseArray(int nRows, int nCols, char zeroArray[nRows][nCols]){
  * @param fileName name of input file
  */
 void scanFile(int nRows, int nCols, char boardArray[nRows][nCols], char* fileName){
-	FILE file = fopen(fileName);
 	for (int i = 0; i < nRows; i++){
 		for (int j = 0; j < nCols; j++){
-
+			//code
 		}
 	}
 }
@@ -89,29 +88,37 @@ void scanFile(int nRows, int nCols, char boardArray[nRows][nCols], char* fileNam
  * @param New changed array
  * @return void
  */
-void PlayOne (unsigned int nr, unsigned int nc, char Old[][nc], char New[][nc], int maxGen)
+void PlayOne (unsigned int nr, unsigned int nc, char Old[][nc], char New[][nc])
 {
 	int nRows = nr;
 	int nCols = nc;
-	char Spare[nr][nc];
-	int currentGen = 0;
-	for(int row = 0;row < nRows;row++)
+	//loop over all locations in the new dish
+	//figure out whether occupied or not
+	for(int row=0;row<nRows;row++)
 	{
-		for(int col=0; col < nCols; col++)
+		for(int col=0; col<nCols; col++)
 		{
-			*( ((char*) New) + (row * nCols) + col) = *( ((char*) Old) + (row * nCols) + col);
-			currentGen++;
-		}
-	}
 
-	if (endgame(nr, nc, Spare, Old, New, currentGen, maxGen)){
-		//code to print out final board config
-	}
-	else {
-		//set current new to old
-		//set current old to spare
-		//get rid of spare
-		PlayOne(nRows, nCols, Old, New, maxGen);
+			if(occupied(row, col, Old, nRows, nCols)
+					&&((numNeighbors(row, col, Old, nRows, nCols)<2)
+							|| (numNeighbors(row, col, Old, nRows, nCols)>3)))
+			{
+				New[row][col]='o';
+			}
+			else if(occupied(row, col, Old, nRows, nCols))
+			{
+				New[row][col]='x';
+			}
+			else if(numNeighbors(row, col, Old, nRows, nCols)==3)
+			{
+				New[row][col]='x';
+
+			}
+			else
+			{
+				New[row][col]='o';
+			}
+		}
 	}
 }
 
