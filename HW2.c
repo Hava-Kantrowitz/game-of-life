@@ -1,10 +1,10 @@
 /*
  ============================================================================
  Name        : HW2.c
- Author      : Hava Kantrowitz
- Version     : Jan 24, 2019
+ Author      : 
+ Version     :
  Copyright   : Your copyright notice
- Description : Homework 2 Starter Code
+ Description : Hello World in C, Ansi-style
  ============================================================================
  */
 
@@ -14,8 +14,10 @@
 #include "tests.h"
 #include "production.h"
 
-int main(int argc, char*argv[]) {
+int main(int argc, char* argv[])
+{
 	bool ok=false;
+
 	puts("!!!Hi all. We're doing HW2!!!");
 	if(tests())
 	{
@@ -35,4 +37,3 @@ int main(int argc, char*argv[]) {
 	}
 	return EXIT_SUCCESS;
 }
-

@@ -1,8 +1,8 @@
 /*
  * production.c
  *
- *  Created on: Jan 24, 2019
- *      Author: Hava Kantrowitz
+ *  Created on: Nov 3, 2018
+ *      Author: student
  */
 
 #include <stdbool.h>
@@ -10,34 +10,44 @@
 #include <stdlib.h>
 #include "production.h"
 #include <math.h>
+#include <string.h>
 
-/**
- * Reads input and produces the game board for Life
- * @param argc WHAT IT IS
- * @param argv WHAT IT IS
- * @return true if production is completed successfully
- */
 bool production(int argc, char* argv[])
 {
 	bool results = false;
+	bool ok2; //for opening file
 	bool done = false;
 	int nRows=-1;
 	int nCols = -1;
-	int gens = -1; //number of generations to play
-	int pause = -1;
+	int gens = 0; //number of generations to play
+	int howManyLinesInFile = 0;
+	int maximumWidth = 0;
+	char filename[100];
+	for(int i= 0; i<100; i++)
+	{
+		filename[i]='\0';
+	}
+	char print = 'n';
+	char pause = 'n';
 	//etc.
 	//get the NR NC gens input [print] [pause], Usage as needed.
-
-	// Must first check if there are at least 4 arguments on the command line
-
-
-	// Next, check if print and pause are on the command line
-	if(argc<7)
-	{//must be that pause is not included, so give it a default value
-		pause = 0;
-	}
-	else
+	if(argc<5)//not all mandatory args provided
 	{
+		usage();
+		done=true;
+	}
+	else if (argc >= 7)
+	{
+		pause = argv[6][0];
+	}
+	if (!done && (argc >= 6))
+	{
+		print = argv[5][0];
+	}
+
+	if(!done)//must be greater than or equal to 5, so get the mandatory vals
+	{
+
 		char* ptr=0;
 		long nr_l = strtol(argv[1],&ptr,10);//get the NR
 		nRows = (int)nr_l;
@@ -46,49 +56,81 @@ bool production(int argc, char* argv[])
 			printf("Usage: Rows should be greater than 0, received %d.\n",nRows);
 			done = true;
 		}
-	}
+
+		//stuff missing here
+
+		strcpy(filename, argv[4]);
+		//now we have the command line
+		//Let's read the input file
+		FILE* fp = fopen(filename, "r"); //we try to read it
+		if (fp != false)
+		{//it opened, yay!
+			printf("Opened %s.\n",filename);
+			ok2 = true;
+			//can we read the data?
+			char oRow[100];
+			//Let's find out how many lines there are, and
+			//find out the maximum width
+			bool doneReadingFile = false;
+			while(!doneReadingFile)
+			{
+				oRow[0]='\0';
+				fscanf(fp, "%s", oRow);
+				if(strlen(oRow)!=0)//there was something there
+				{
+					howManyLinesInFile++;
+					//update maximum width???
+				}
+				else
+				{
+					doneReadingFile = true;
+					fclose(fp);
+				}
+			}
+
+		}//can read filename
+		else
+		{
+			puts("Cannot find that file");
+			done = true;
+		}
+		if(!done)
+		{
+			char A[nRows][nCols];
+			char B[nRows][nCols];
+			char C[nRows][nCols];
+			char* old_p=&A[0][0];
+			char* new_p=&B[0][0];
+			char* other_p=&C[0][0];
+
+			for(int row = 0; row< nRows; row++)
+			{
+				for(int col = 0; col<nCols; col++)
+				{
+					//initialize elements of A, B and C
+				}
+			}
+			FILE* fp = fopen(filename, "r");//we read it before, we expect we can read it again
+			readFileIntoArray(nRows, nCols, howManyLinesInFile,  maximumWidth, old_p, fp);
+
+			int howManyGens = generate(gens,  nRows,  nCols,  old_p, new_p, other_p, print, pause);
+			printf("Ran %d generations\n", howManyGens);
+		}
+
+	}//not done
+	results = !done;
 	return results;
 
 }
-
 /**
- * populates an array with 'o'
- * @param nRows number of rows in array
- * @param nCols number of columns in array
- * @param zeroArray array to populate with 'o'
+ * PlayOne carries out one generation
+ * @param unsigned int nr, the number of rows in the petri dish
+ * @param unsigned int nc, the number of columns in the petri dish
+ * @param char* Old, the location of the upper left of starting petri dish
+ * @param char* New, the location of the upper left of the ending petri dish
+ * @return There is none, because results are in New array
  */
-void fillBaseArray(int nRows, int nCols, char zeroArray[nRows][nCols]){
-	for (int i = 0; i < nRows; i++){
-		for (int j = 0; j < nCols; j++){
-			zeroArray[i][j] = 'o';
-		}
-	}
-}
-
-/**
- * reads from file and creates populated array
- * @param nRows number of rows
- * @param nCols number of columns
- * @param boardArray board to populate
- * @param fileName name of input file
- */
-void scanFile(int nRows, int nCols, char boardArray[nRows][nCols], char* fileName){
-	for (int i = 0; i < nRows; i++){
-		for (int j = 0; j < nCols; j++){
-			//code
-		}
-	}
-}
-
-/**
- * Plays one generation of life
- * @param nr number of rows on board
- * @param nc number of columns on board
- * @param Old original array
- * @param New changed array
- * @return void
- */
-void PlayOne (unsigned int nr, unsigned int nc, char Old[][nc], char New[][nc])
+void PlayOne (unsigned int nr, unsigned int nc, char* Old, char* New)
 {
 	int nRows = nr;
 	int nCols = nc;
@@ -98,175 +140,240 @@ void PlayOne (unsigned int nr, unsigned int nc, char Old[][nc], char New[][nc])
 	{
 		for(int col=0; col<nCols; col++)
 		{
+			//There are three rules,
+			// use occupied in old
+			//use neighbors in old
+			bool occupied = true;
+			occupied = 	(getLetter(row,col,nCols, Old)=='x');
 
-			if(occupied(row, col, Old, nRows, nCols)
-					&&((numNeighbors(row, col, Old, nRows, nCols)<2)
-							|| (numNeighbors(row, col, Old, nRows, nCols)>3)))
-			{
-				New[row][col]='o';
+			if(occupied
+					&&((HowManyNeighbors(row, col, nRows, nCols, Old)<2)
+							|| (HowManyNeighbors(row, col, nRows, nCols, Old)>3)))
+			{//Death rule
+				*(New + (row * nCols) + col)='o';
 			}
-			else if(occupied(row, col, Old, nRows, nCols))
-			{
-				New[row][col]='x';
+			else if(occupied)
+			{//Survival rule
+				*(New + (row * nCols) + col)='x';
 			}
-			else if(numNeighbors(row, col, Old, nRows, nCols)==3)
-			{
-				New[row][col]='x';
+			else if(HowManyNeighbors(row, col, nRows, nCols, Old)==3)
+			{//Birth rule
+				*(New + (row * nCols) + col)='x';
 
 			}
 			else
 			{
-				New[row][col]='o';
+				*(New + (row * nCols) + col)='o';
 			}
 		}
 	}
 }
 
-/**
- * Determines if a cell in an array is occupied
- * @param row the row the cell is in
- * @param col the column the cell is in
- * @param cell the array in which the cell occurs
- * @param nRow the number of rows in the array
- * @param nCol the number of columns in the array
- * @return 1 if the cell is occupied, 0 if the cell is not occupied
- * 			If the cell is unoccupied, it will have a 'o' in it
- * 			If the cell is occupied, it will have a 'x' in it
- * 			It is assumed that there will be no values besides 'o' and 'x'
- * 				within the given cell
- * 			All values outside the range of the array are considered unoccupied
- */
-int occupied(int row, int col, char cell[][col], int nRow, int nCol){
-	int occupied = 1;
-	if (row > nRow || row < 0){
-		occupied = 0;
-	}
-	else if (col > nCol || col < 0){
-		occupied = 0;
-	}
-	else if (cell[row][col] == 'o'){
-		occupied = 0;
-	}
-
-	return occupied;
-
+void usage(void)
+{
+	puts("Usage: HW2 NR NC gens input [print] [pause]");
 }
-
-/**
- * Compares two arrays
- * @param nRows number of rows in arrays
- * @param nCols number of columns in arrays
- * @param array1 the first array to compare
- * @param array2 the second array to compare
- * @return 1 if the arrays are the same, 0 if the arrays are different
- */
-int arrayComparison(int nRows, int nCols, char array1[][nCols], char array2[][nCols]){
-	int same = 1;
-	for(int row = 0; row < nRows; row++){
-		for (int col = 0; col < nCols; col++){
-			if (occupied(row,col,array1,nRows,nCols) == occupied(row,col,array2,nRows,nCols)){
-				same = 0;
+char getLetter(int row, int col, int nCols, char* Old)
+{
+	return *(Old+ (row*nCols)+col);
+}
+int HowManyNeighbors(int row, int col, int nRows, int nCols, char* Old)
+{
+	int howManyN = 0;
+	//there could be as many as 8 neighbors
+	//cells on an edge or corner have fewer neighbors
+	//we will search for neighbors clockwise from NorthWest
+	if (row>0)
+	{
+		if(col>0)
+		{
+			if(getLetter(row-1, col-1,nCols, Old)=='x')//NW
+			{
+				howManyN++;
 			}
+		}
+		if(getLetter(row-1, col,nCols, Old)=='x')//N
+		{
+			howManyN++;
+		}
+		if(col<(nCols-1))
+		{
+			if(getLetter(row-1, col+1,nCols, Old)=='x')//NE
+			{
+				howManyN++;
+			}
+		}
+	}//can look north
+	if(col>0)
+	{
+		if(getLetter(row, col-1,nCols, Old)=='x')//W
+		{
+			howManyN++;
+		}
+	}
+	if(col<(nCols-1))
+	{
+		if(getLetter(row, col+1,nCols, Old)=='x')//E
+		{
+			howManyN++;
+		}
+	}
+	if(row<nRows-1)
+	{
+		if(col>0)
+		{
+			if(getLetter(row+1, col-1,nCols, Old)=='x')//SW
+			{
+				howManyN++;
+			}
+		}
+		if(getLetter(row+1, col,nCols, Old)=='x')//S
+		{
+			howManyN++;
+		}
+		if(col<(nCols-1))
+		{
+			if(getLetter(row+1, col+1,nCols, Old)=='x')//SE
+			{
+				howManyN++;
+			}
+		}
+	}//can look south
+
+	return howManyN;
+}
+void readFileIntoArray(int nRows, int nCols, int howManyLinesInFile, int maximumWidth, char* ar_p, FILE* fp)
+{
+	for(int row = 0; row< nRows; row++)
+	{
+		for(int col = 0; col<nCols; col++)
+		{
+			*(ar_p+(row*nCols)+col) = 'o';
+
 		}
 	}
 
+	for(int frow=0; frow< howManyLinesInFile; frow++)
+	{
+		char fromFile[maximumWidth];
+
+		for(int i = 0; i<maximumWidth; i++)
+		{
+			fromFile[i]='o';
+		}
+		fscanf(fp, "%s", fromFile);
+		for(int fcol=0; fcol<maximumWidth; fcol++)
+		{
+			if(fromFile[fcol]=='x')
+			{
+				int targetRow = frow+(nRows-howManyLinesInFile)/2;
+				int targetCol = fcol+(nCols-maximumWidth)/2;
+				*(ar_p+(targetRow*nCols)+targetCol) = 'x';
+			}
+		}
+	}
+}
+int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* other_p, char print, char pause)
+{
+	int g = 0;
+	bool allOrganismsDead = false;
+	bool patternRepeated = false;
+	bool done = false;
+	bool firstTime; //what's the right initialization for this?
+
+	for(int gensDone = 0; !done && (gensDone<gens); gensDone++)
+	{
+		if(!anyX(old_p, nRows, nCols))
+		{//all organisms are dead
+			allOrganismsDead =  true;
+			done = true;
+			puts("All organisms dead.");
+			printThis(nRows, nCols, old_p);
+		}
+		PlayOne(nRows, nCols, old_p, new_p);
+		g++;
+		//if(sameContent()) what goes here?
+		{
+			patternRepeated = true;
+			done = true;
+			puts("Pattern repeated in one generation.");
+			printThis(nRows, nCols, old_p);
+		}
+		if(firstTime)
+		{
+			firstTime = false;
+		}
+		else
+		{
+			//if(sameContent()) what goes here?
+			{
+				patternRepeated = true;
+				puts("Pattern repeated after two generations.");
+				printThis(nRows, nCols, other_p);
+				done= true;
+
+			}
+		}
+		if(!done)
+		{
+			if(print=='y')
+			{
+				puts("New generation");
+				printThis(nRows, nCols, new_p);
+			}
+			if(pause=='y')
+			{
+				puts("Paused waiting for input.");
+				getc(stdin);//just waits for user input
+			}
+			//musical chairs for the pointers, i.e., which is old, new, other?
+		}
+
+
+	}//end of generations
+
+	return g;
+}
+bool anyX(char* arr, int nRows, int nCols)
+{
+	bool any = false;
+	for(int row=0; !any && (row<nRows); row++)
+	{
+		for(int col=0; !any && (col< nCols); col++)
+		{
+			if(true)//what goes here instead of true?
+			{
+				any=true;
+			}
+		}
+	}
+	return any;
+}
+bool sameContent(char* one_p, char* another_p, int nRows, int nCols)
+{
+	bool same = true; //for all the comparisons that have been made so far
+
+	for(int row=0; same && (row<nRows); row++)
+	{
+		for(int col=0; same && (col< nCols); col++)
+		{
+			if(true)//what goes here instead of true?
+			{
+				same=false;
+			}
+		}
+	}
 	return same;
-}
 
-/**
- * Determines the number of neighbors a cell has
- * @param row the row the cell is in
- * @param col the column the cell is in
- * @param array the array in which the cell occurs
- * @param totalR total rows of array
- * @param totalC total columns of array
- * @return number of neighbors the cell has
- */
-int numNeighbors(int row, int col, char array[][col], int totalR, int totalC){
-	int neighbors = 0;
-	//check upper left corner
-	if (occupied(row-1, col-1, array, totalR, totalC)){
-		neighbors++;
-	}
-	//check direct above
-	if (occupied(row-1, col, array, totalR, totalC)){
-		neighbors++;
-	}
-	//check upper right corner
-	if (occupied(row-1, col+1, array, totalR, totalC)){
-		neighbors++;
-	}
-	//check direct left
-	if (occupied(row, col-1, array, totalR, totalC)){
-		neighbors++;
-	}
-	//check direct right
-	if (occupied(row, col+1, array, totalR, totalC)){
-		neighbors++;
-	}
-	//check lower left corner
-	if (occupied(row+1, col-1, array, totalR, totalC)){
-		neighbors++;
-	}
-	//check direct lower
-	if(occupied(row+1, col, array, totalR, totalC)){
-		neighbors++;
-	}
-	//check lower right corner
-	if (occupied(row+1, col+1, array, totalR, totalC)){
-		neighbors++;
-	}
-	return neighbors;
 }
-
-/**
- * determines if the board is empty
- * @param nRows numner of rows in array
- * @param nCols number of columns in array
- * @param testArray array to test for emptiness
- * @return 1 if array is empty, 0 if array has at least one square populated
- */
-int emptyBoard(int nRows, int nCols, char testArray[][nCols]){
-	int empty = 1;
-	for(int row = 0; row < nRows; row++){
-		for (int col = 0; col < nCols; col++){
-			if (numNeighbors(row, col, testArray, nRows, nCols) > 0){
-				empty = 0;
-			}
+void printThis(int nRows, int nCols, char* old_p)
+{
+	for(int row=0;row<nRows;row++)
+	{
+		for(int col=0;col<nCols;col++)
+		{
+			printf("%d",*(old_p+ (row*nCols)+col));
 		}
+		printf("\n");
 	}
-
-	return empty;
 }
-
-/**
- * determines if ending conditions are met
- * @param nRows number of rows in array
- * @param nCols number of columns in array
- * @param twoPreviousArray array created two generations before
- * @param previousArray the array from the generation before
- * @param nowArray the array created in the current generation
- * @return 0 if terminating conditions aren't met
- * 			1 if terminating condition of repeated pattern is reached
- * 			2 if maximum number of generations is reached
- * 			3 if all cells on board are unoccupied
- */
-int endGame(int nRows, int nCols, char twoPreviousArray[][nCols], char previousArray[][nCols], char nowArray[][nCols],
-			int numGens, int maxGens){
-	int finish = 0;
-	if (arrayComparison(nRows, nCols, previousArray, nowArray)){
-		finish = 1;
-	}
-	else if (arrayComparison(nRows, nCols, twoPreviousArray, nowArray)){
-		finish = 1;
-	}
-	else if (numGens == maxGens){
-		finish = 2;
-	}
-	else if (emptyBoard(nRows, nCols, nowArray)){
-		finish = 3;
-	}
-
-	return finish;
-}
-

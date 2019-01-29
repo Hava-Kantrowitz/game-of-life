@@ -1,8 +1,8 @@
 /*
  * tests.c
  *
- *  Created on: Jan 24, 2019
- *      Author: Hava Kantrowitz
+ *  Created on: Nov 3, 2018
+ *      Author: student
  */
 #include <stdbool.h>
 #include "tests.h"
@@ -16,13 +16,14 @@ bool tests(void)
 	bool results=false;
 	puts("During tests");
 	bool ok1 = testReadInput();
-	if(ok1)puts("Found and read the file.");
+	if(ok1)puts("Found and read the test file.");
 	bool ok2 = testMakeArrays();
 	if(ok2)puts("Was able to allocate the arrays ok.");
 	bool ok3 = testPlayOne();
 	if(ok3)puts("playOne is ok.");
 	puts("end of tests");
 	results = ok1 && ok2 && ok3;
+	printf("tests returning %d.\n",results);
 	return results;
 }
 bool testReadInput(void)
@@ -65,38 +66,33 @@ bool testReadInput(void)
 	if (fp != false)
 	{//it opened, yay!
 		ok2 = true;
-
-		ok3 = true;
 		//can we read the correct data?
 		char oRow[4]; //test case, we know a string of 3 chars terminated by null
 		int count =  fscanf(fp, "%s", oRow);
 		//printf("First row is %s\n", oRow);
-		if(0 != strncmp(oRow, "oxo", 4))//0 means match
+		if(0==strncmp(oRow, "oxo", 4))//0 means match
 		{//got the right data
-			ok3 = false;
+			ok3 = true;
 		}
 		fscanf(fp, "%s", oRow);
 		//printf("Second row is %s\n", oRow);
-		if(0 != strncmp(oRow, "xox", 4))
+		if(0==strncmp(oRow, "xox", 4))
 		{//got the right data
-			ok3 = false;
+			ok3 = true;
 		}
 		fscanf(fp, "%s", oRow);
 		//printf("Third row is %s\n", oRow);
-		if(0 != strncmp(oRow, "xox", 4))
+		if(0==strncmp(oRow, "xox", 4))
 		{//got the right data
-			ok3 = false;
+			ok3 = true;
 		}
 		fscanf(fp, "%s", oRow);
 		//printf("Fourth row is %s\n", oRow);
-		if(0 != strncmp(oRow, "oxo", 4))
+		if(0==strncmp(oRow, "oxo", 4))
 		{//got the right data
-			ok3 = false;
+			ok3 = true;
 		}
 	}
-
-	// Still need to try opening a non-existent file for reading.
-
 	results = ok1 && ok2 && ok3;
 	return results;
 }
@@ -114,6 +110,7 @@ bool testMakeArrays(void)
 			{'x','o','x','\0'},
 			{'o','x','o','\0'}
 	};
+
 
 	char boardAfter[nRows][nCols];
 	//here's the test
@@ -147,30 +144,34 @@ bool testPlayOne(void)
 
 
 	int nRows = 4;
-	int nCols = 4;
-	char boardBefore[4][4]={
-			{'o','x','o','\0'},
-			{'x','o','x','\0'},
-			{'x','o','x','\0'},
-			{'o','x','o','\0'}
+	int nCols = 3;
+	char boardBefore[4][3]={
+			{'o','x','o'},
+			{'x','o','x'},
+			{'x','o','x'},
+			{'o','x','o'}
 	};
-	char correctBoardAfter[4][4]={
-			{'o','x','o','\0'},
-			{'x','o','x','\0'},
-			{'x','o','x','\0'},
-			{'o','x','o','\0'}
+	char correctBoardAfter[4][3]={
+			{'o','x','o'},
+			{'x','o','x'},
+			{'x','o','x'},
+			{'o','x','o'}
 	};
 
 	char boardAfter[nRows][nCols];
+	printf("ARRAY IMMEDIATELY AFTER GENERATION:\n");
+	printThis(nRows,nCols,correctBoardAfter);
+	printf("SHOULD BE UNCHANGED--CORRECT :)\n");
+
 	//here's the invocation
-	PlayOne(nRows, nCols, boardBefore, boardAfter);
+	PlayOne(nRows, nCols, (char*)boardBefore, (char*)boardAfter);
 	//here's the check
 	ok1 = true; //no errors found yet
 	for(int row=0;row<nRows;row++)
 	{
 		for(int col=0; col<nCols; col++)
 		{
-			if(boardAfter[row][col] != boardBefore[row][col])
+			if(boardAfter[row][col]!=boardBefore[row][col])
 			{//error found
 				ok1 = false;
 			}
@@ -178,4 +179,5 @@ bool testPlayOne(void)
 	}
 	results = ok1;
 	return results;
+
 }
