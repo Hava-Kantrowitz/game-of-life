@@ -366,14 +366,16 @@ bool sameContent(char* one_p, char* another_p, int nRows, int nCols)
 	return same;
 
 }
+
 void printThis(int nRows, int nCols, char* old_p)
 {
 	for(int row=0;row<nRows;row++)
 	{
 		for(int col=0;col<nCols;col++)
 		{
-			printf("%d",*(old_p+ (row*nCols)+col));
+			printf("%c",*(old_p + (row * nCols) + col));
 		}
 		printf("\n");
 	}
 }
+

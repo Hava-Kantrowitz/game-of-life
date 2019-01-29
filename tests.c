@@ -148,8 +148,8 @@ bool testPlayOne(void)
 	char boardBefore[4][3]={
 			{'o','x','o'},
 			{'x','o','x'},
-			{'x','o','x'},
-			{'o','x','o'}
+			{'o','x','o'},
+			{'x','o','x'}
 	};
 	char correctBoardAfter[4][3]={
 			{'o','x','o'},
@@ -159,9 +159,6 @@ bool testPlayOne(void)
 	};
 
 	char boardAfter[nRows][nCols];
-	printf("ARRAY IMMEDIATELY AFTER GENERATION:\n");
-	printThis(nRows,nCols,correctBoardAfter);
-	printf("SHOULD BE UNCHANGED--CORRECT :)\n");
 
 	//here's the invocation
 	PlayOne(nRows, nCols, (char*)boardBefore, (char*)boardAfter);
