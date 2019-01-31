@@ -1,8 +1,8 @@
 /*
  * tests.h
  *
- *  Created on: Nov 3, 2018
- *      Author: student
+ *  Created on: Jan 30, 2019
+ *      Author: Hava Kantrowitz
  */
 
 #ifndef TESTS_H_

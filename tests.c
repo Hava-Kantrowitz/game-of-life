@@ -1,8 +1,8 @@
 /*
  * tests.c
  *
- *  Created on: Nov 3, 2018
- *      Author: student
+ *  Created on: Jan 30, 2019
+ *      Author: Hava Kantrowitz
  */
 #include <stdbool.h>
 #include "tests.h"
@@ -146,16 +146,16 @@ bool testPlayOne(void)
 	int nRows = 4;
 	int nCols = 3;
 	char boardBefore[4][3]={
-			{'o','x','o'},
-			{'x','o','x'},
-			{'o','x','o'},
-			{'x','o','x'}
+			{'o','o','o'},
+			{'x','x','o'},
+			{'x','x','o'},
+			{'o','o','o'}
 	};
 	char correctBoardAfter[4][3]={
-			{'o','x','o'},
-			{'x','o','x'},
-			{'x','o','x'},
-			{'o','x','o'}
+			{'o','o','o'},
+			{'x','x','o'},
+			{'x','x','o'},
+			{'o','o','o'}
 	};
 
 	char boardAfter[nRows][nCols];
@@ -171,7 +171,9 @@ bool testPlayOne(void)
 			if(boardAfter[row][col]!=boardBefore[row][col])
 			{//error found
 				ok1 = false;
+				printf("error found: %c does not equal %c. Row is %d, column is %d.\n", boardBefore[row][col], boardAfter[row][col], row, col);
 			}
+
 		}
 	}
 	results = ok1;
