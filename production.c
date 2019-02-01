@@ -42,7 +42,11 @@ bool production(int argc, char* argv[])
 		usage();
 		done=true;//set done to true, finishing production
 	}
-	else if (argc >= 7)//if there are enough arguments on the command line, there must be pause and print
+	else if(argc > 7){//too many args provided
+		usage();
+		done = true;//set done to true, finishing production
+	}
+	else if (argc == 7)//if there are enough arguments on the command line, there must be pause and print
 	{
 		pause = argv[6][0];//record the value in the "pause" column in the pause variable
 	}
@@ -144,6 +148,9 @@ bool production(int argc, char* argv[])
 			FILE* fp = fopen(filename, "r");//we read it before, we expect we can read it again
 			readFileIntoArray(nRows, nCols, howManyLinesInFile,  maximumWidth, old_p, fp);//read file into old array
 
+			//Let user know the initial, user-given pattern
+			puts("Initial pattern is:");
+			printThis(nRows, nCols, old_p);
 			//determine the total number of generations ran before completion
 			int howManyGens = generate(gens,  nRows,  nCols,  old_p, new_p, other_p, print, pause);
 			printf("Ran %d generations\n", howManyGens);//let user know the number of gens
@@ -368,13 +375,14 @@ int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* 
 	bool firstTime = true;//for keeping track if this is the first time a new generation has been attempted, initialized to true
 	char* spare_p; //creates spare pointer
 
-	for(int gensDone = 0; !done && (gensDone<gens); gensDone++)//Loops through each generation until max number of generations is reached
+	for(int gensDone = 0; !done && (gensDone<=gens); gensDone++)//Loops through each generation until max number of generations is reached
 	{
 		if(!anyX(old_p, nRows, nCols))//if no cells have an x, all organisms are dead, end game and let user know
 		{
 			allOrganismsDead =  true;
 			done = true;
 			puts("All organisms dead.");
+			puts("Final pattern is:");
 			printThis(nRows, nCols, old_p);
 		}
 		PlayOne(nRows, nCols, old_p, new_p);//play a new generation and increase the generation number
@@ -384,6 +392,7 @@ int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* 
 			patternRepeated = true;
 			done = true;
 			puts("Pattern repeated in one generation.");
+			puts("Final pattern is:");
 			printThis(nRows, nCols, old_p);
 		}
 		if(firstTime)//if it's the first time the game has been played, change to false
@@ -396,6 +405,7 @@ int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* 
 			{
 				patternRepeated = true;
 				puts("Pattern repeated after two generations.");
+				puts("Final pattern is:");
 				printThis(nRows, nCols, other_p);
 				done= true;
 
@@ -419,6 +429,14 @@ int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* 
 			other_p = old_p;
 			old_p = new_p;
 			new_p = spare_p;
+
+			//If end of user given gens is reached, decrement the gen number, let user know, and print array
+			if (gensDone == gens){
+				g--;
+				puts("Pattern terminated after user-specified generations.");
+				puts("Final pattern is:");
+				printThis(nRows, nCols, old_p);
+			}
 
 		}
 
