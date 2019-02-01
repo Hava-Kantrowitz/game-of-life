@@ -35,7 +35,7 @@ bool production(int argc, char* argv[])
 	}
 	char print = 'n';//character to determine if there is a print, initialized to no
 	char pause = 'n';//character to determine if there is a pause, initialized to no
-	//etc.
+
 	//get the NR NC gens input [print] [pause], Usage as needed.
 	if(argc<5)//not all mandatory args provided
 	{
@@ -54,16 +54,35 @@ bool production(int argc, char* argv[])
 	if(!done)//must be greater than or equal to 5, so get the mandatory vals
 	{
 
+		//get the number of rows from the command line
 		char* ptr=0;//pointer to character, initialized to 0
-		long nr_l = strtol(argv[1],&ptr,10);//get the NR
-		nRows = (int)nr_l;//set the number of rows equal to the NR input
+		long nr_l = strtol(argv[1],&ptr,10);//get the NR as a decimal number, store in long datatype
+		nRows = (int)nr_l;//set the number of rows equal to the NR input, cast NR to int
 		if(nRows<1)//If there aren't enough rows to play the game, let user know and end production
 		{
 			printf("Usage: Rows should be greater than 0, received %d.\n",nRows);
 			done = true;
 		}
 
-		//stuff missing here
+		//get the number of columns from the command line
+		char* ptr1 = 0;//pointer to character, initialized to 0
+		long nc_l = strtol(argv[2],&ptr1,10);//get the NR as a decimal number, store in long datatype
+		nCols = (int)nc_l;//set the number of rows equal to the NC input, cast NC to int
+		if(nRows<1)//If there aren't enough columns to play the game, let user know and end production
+		{
+			printf("Usage: Columns should be greater than 0, received %d.\n",nCols);
+			done = true;
+		}
+
+		//get the number of generations from the command line
+		char* ptr2 = 0;//pointer to character, initialized to 0
+		long gen_l = strtol(argv[2],&ptr2,10);//get the generation as a decimal number, store in long datatype
+		gens = (int)gen_l;//set the number of gens equal to the generation input, cast gen to int
+		if(gens<1)//If there aren't enough generations to play the game, let user know and end production
+		{
+			printf("Usage: Generations should be greater than 0, received %d.\n",nCols);
+			done = true;
+		}
 
 		strcpy(filename, argv[4]);//makes a copy of the file on the command line
 		//Let's read the input file
@@ -76,14 +95,19 @@ bool production(int argc, char* argv[])
 			char oRow[100];
 			//Find out lines and total width
 			bool doneReadingFile = false;
-			while(!doneReadingFile)//can read filename
+			while(!doneReadingFile)//can file is not done being read
 			{
 				oRow[0]='\0';
 				fscanf(fp, "%s", oRow);
 				if(strlen(oRow)!=0)//there was something there
 				{
-					howManyLinesInFile++;
-					//update maximum width???
+					howManyLinesInFile++;//increment the number of lines in the file
+
+					//if the length of the row is longer than the current max width
+					//set it as the new max width
+					if (maximumWidth < strlen(oRow)){
+						maximumWidth = strlen(oRow);
+					}
 				}
 				else//when there's no lines left, close the file
 				{
@@ -107,7 +131,8 @@ bool production(int argc, char* argv[])
 			char* new_p=&B[0][0];//pointer to new array
 			char* other_p=&C[0][0];//pointer to spare array
 
-			for(int row = 0; row< nRows; row++)//loop through rows and columns of A, B, C, initializing them all to dead cells
+			//loop through rows and columns of A, B, C, initializing them all to dead cells
+			for(int row = 0; row< nRows; row++)
 			{
 				for(int col = 0; col<nCols; col++)
 				{
@@ -395,7 +420,6 @@ int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* 
 			old_p = new_p;
 			new_p = spare_p;
 
-
 		}
 
 
@@ -469,7 +493,12 @@ void printThis(int nRows, int nCols, char* old_p)
 	{
 		for(int col=0;col<nCols;col++)
 		{
-			printf("%c", *(old_p+(row*nCols)+col));
+			if (*(old_p+(row*nCols)+col) == 'o'){
+				printf(" ");
+			}
+			else{
+				printf("%c", *(old_p+(row*nCols)+col));
+			}
 		}
 		printf("\n");//when the row is finished, prints a newline
 	}

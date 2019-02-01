@@ -14,6 +14,7 @@
  bool testPlayOneSteadyState(void);
  bool testPlayOneBlinker(void);
  bool testPlayOneToad(void);
+ bool testEndDeadBoard(void);
  bool testEndThreeGens(void);
  bool testEndOnePreviousGen(void);
  bool testEndOneGrandfatherGen(void);

@@ -20,33 +20,44 @@ bool tests(void)
 	bool results=false;
 	puts("During tests");
 	bool ok1 = testReadInput();
-	if(ok1)puts("Found and read the test file.");
+	//if(ok1)puts("Found and read the test file.");
 	bool ok2 = testMakeArrays();
-	if(ok2)puts("Was able to allocate the arrays ok.");
+	//if(ok2)puts("Was able to allocate the arrays ok.");
 	bool ok3 = testPlayOneSteadyState();
-	if(ok3)puts("One generation, steady state, is ok.");
+	//if(ok3)puts("One generation, steady state, is ok.");
 	bool ok4 = testPlayOneBlinker();
-	if(ok4)puts("Blinker one generation is ok.");
+	//if(ok4)puts("Blinker one generation is ok.");
 	bool ok5 = testPlayOneToad();
-	if(ok5)puts("Toad one generation is ok.");
+	//if(ok5)puts("Toad one generation is ok.");
 	bool ok6 = testEndThreeGens();
-	if(ok6)puts("Termination after 3 generations is ok.");
+	//if(ok6)puts("Termination after 3 generations is ok.");
 	bool ok7 = testEndOnePreviousGen();
-	if(ok7)puts("Termination steady state is ok.");
+	//if(ok7)puts("Termination steady state is ok.");
 	bool ok8 = testEndOneGrandfatherGen();
-	if(ok8)puts("Termination oscillating state is ok.");
+	//if(ok8)puts("Termination oscillating state is ok.");
 	bool ok9 = testGetLetterX();
-	if(ok9)puts("Grab of x is ok.");
+	//if(ok9)puts("Grab of x is ok.");
 	bool ok10 = testGetLetterO();
-	if(ok10)puts("Grab of o is ok.");
+	//if(ok10)puts("Grab of o is ok.");
 	bool ok11 = testNoNeighbors();
-	if(ok11)puts("No neighbors is ok.");
+	//if(ok11)puts("No neighbors is ok.");
 	bool ok12 = testFourNeighbors();
-	if(ok12)puts("Four neighbors is ok.");
+	//if(ok12)puts("Four neighbors is ok.");
 	bool ok13 = testEightNeighbors();
-	if(ok13)puts("All neighbors is ok.");
+	//if(ok13)puts("All neighbors is ok.");
+	bool ok14 = testEndDeadBoard();
+	//if(ok14)puts("Termination of dead board is ok.");
+	bool ok15 = testAnyXArrayOccupied();
+	//if(ok15)puts("Occupied array is ok.");
+	bool ok16 = testAnyXArrayEmpty();
+	//if(ok16)puts("Empty array is ok.");
+	bool ok17 = testSameContentSameArrays();
+	//if(ok17)puts("Same content array is ok.");
+	bool ok18 = testSameContentDifferentArrays();
+	//if(ok18)puts("Different content is ok.");
 	puts("END OF TESTS.");
-	results = ok1 && ok2 && ok3 && ok4 && ok5 && ok6 && ok7 && ok8 && ok9 && ok10 && ok11 && ok12 && ok13;
+	results = ok1 && ok2 && ok3 && ok4 && ok5 && ok6 && ok7 && ok8 && ok9 && ok10 && ok11 && ok12 && ok13
+			&& ok14 && ok15 && ok16 && ok17 && ok18;
 	printf("tests returning %d.\n",results);
 	return results;
 }
@@ -306,6 +317,43 @@ bool testPlayOneToad(void){
 	}
 	results = ok1;//set the overall results equal to the result of the first test element
 	return results;//return overall results
+}
+
+bool testEndDeadBoard(void){
+	bool results = false;//result of test, initialized to false
+
+	int gens = 3;//set number of generations to 3
+	int nRows = 2;//set number of rows to 2
+	int nCols = 2;//set number of columns to 2
+
+	char emptyBoard1[2][2] = {
+		{'o','o'},
+		{'o','o'}
+	};//empty board to initialize array a
+
+	char emptyBoard2[2][2] = {
+		{'o','o'},
+		{'o','o'}
+	};//empty board to initialize array b
+
+	char firstGenBoard[6][6] = {
+		{'o','o'},
+		{'x','o'}
+	};//first iteration of the board to initialize first generation of array
+
+	char print = 'n';//initialize print to no
+	char pause = 'n';//initialize pause to no
+
+	int numGens = generate(gens, nRows, nCols, firstGenBoard, emptyBoard1, emptyBoard2, print, pause);
+	//expected end after 1 generation
+	if (numGens == 1){//if the number of generations is the expected number, set results to true
+		results = true;
+	}
+	else{//otherwise let user know error occured, and how many generations actually ran
+		printf("%d generations occurred\n", numGens);
+	}
+
+	return results;//return the result of the tests
 }
 
 /**
@@ -575,8 +623,100 @@ bool testEightNeighbors(void){
 	return results;//return result of tests
 }
 
-bool testAnyXArrayOccupied(void){}
-bool testAnyXArrayEmpty(void){}
+/**
+ * tests if array with at least once occupied cell returns anyX correctly
+ * @return true if test runs successfully, false otherwise
+ */
+bool testAnyXArrayOccupied(void){
+	bool results = false;//result of test, initialized to false
+	int nRows = 2;//number of rows in array
+	int nCols = 2;//number of columns in array
+	char testArray[2][2]={
+		{'x','o'},
+		{'o','o'}
+	};//initializes test array
 
-bool testSameContentSameArrays(void){}
-bool testSameContentDifferentArrays(void){}
+	bool hasX = anyX(testArray, nRows, nCols);
+	//If any cell has an x in it, set results to true
+	if (hasX){
+		results = true;
+	}
+
+	return results;//return result of test
+}
+
+/**
+ * tests if array with no occupied cells returns anyX correctly
+ * @return true if test runs successfully, false otherwise
+ */
+bool testAnyXArrayEmpty(void){
+	bool results = false;//result of test, initialized to false
+	int nRows = 2;//number of rows in array
+	int nCols = 2;//number of columns in array
+	char testArray[2][2]={
+		{'o','o'},
+		{'o','o'}
+	};//initializes test array
+
+	bool hasX = anyX(testArray, nRows, nCols);
+	//If no cell is occupied, set results to true
+	if (!hasX){
+		results = true;
+	}
+
+	return results;//return result of test
+}
+
+/**
+ * tests if two arrays are the same
+ * @return true if test runs successfully, false otherwise
+ */
+bool testSameContentSameArrays(void){
+	bool results = false;//result of test, initialized to false
+	int nRows = 2;//number of rows in array
+	int nCols = 2;//number of columns in array
+	char testArray1[2][2]={
+		{'o','o'},
+		{'x','x'}
+	};//initialization of first comparison array
+
+	char testArray2[2][2]={
+		{'o','o'},
+		{'x','x'}
+	};//initialization of second comparison array
+
+	bool isSame = sameContent(testArray1, testArray2, nRows, nCols);
+	//if the arrays are the same, set result to true
+	if(isSame){
+		results = true;
+	}
+
+	return results;//return result of test
+}
+
+/**
+ * tests if two arrays are the same
+ * @return true if test runs successfully, false otherwise
+ */
+bool testSameContentDifferentArrays(void){
+	bool results = false;//result of test, initialized to false
+	int nRows = 2;//number of rows in array
+	int nCols = 2;//number of columns in array
+	char testArray1[2][2]={
+		{'o','o'},
+		{'x','x'}
+	};//initialization of first comparison array
+
+	char testArray2[2][2]={
+		{'x','x'},
+		{'o','o'}
+	};//initialization of second comparison array
+
+	bool isSame = sameContent(testArray1, testArray2, nRows, nCols);
+	//if the arrays are different, set the result to true
+	if(!isSame){
+		results = true;
+	}
+
+	return results;//return result of test
+}
