@@ -80,7 +80,7 @@ bool production(int argc, char* argv[])
 
 		//get the number of generations from the command line
 		char* ptr2 = 0;//pointer to character, initialized to 0
-		long gen_l = strtol(argv[2],&ptr2,10);//get the generation as a decimal number, store in long datatype
+		long gen_l = strtol(argv[3],&ptr2,10);//get the generation as a decimal number, store in long datatype
 		gens = (int)gen_l;//set the number of gens equal to the generation input, cast gen to int
 		if(gens<1)//If there aren't enough generations to play the game, let user know and end production
 		{
