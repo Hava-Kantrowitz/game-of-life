@@ -129,6 +129,7 @@ bool production(int argc, char* argv[])
 	return results;
 
 }
+
 /**
  * PlayOne carries out one generation
  * @param unsigned int nr, the number of rows in the petri dish
@@ -326,7 +327,7 @@ void readFileIntoArray(int nRows, int nCols, int howManyLinesInFile, int maximum
  * @param gens: number of max generations given by user
  * @param nRows: total number of rows in array
  * @param nCols: total number of columns in array
- * @param old_p: pointer to array that holds previous generation's values
+ * @param old_p: pointer to array that holds previous generation's values, the array under scrutiny
  * @param new_p: pointer to array the holds current generation's values
  * @param other_p: pointer to array that holds two previous generation's values
  * @param print: 'y' if user wants it to print generation, 'n' if user doesn't or didn't give input
@@ -335,11 +336,12 @@ void readFileIntoArray(int nRows, int nCols, int howManyLinesInFile, int maximum
  */
 int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* other_p, char print, char pause)
 {
-	int g = 1;//the number of generations played, initialized to 1
+	int g = 0;//the number of generations played, initialized to 0
 	bool allOrganismsDead = false;//for keeping track if all cells are dead, initialized to false
 	bool patternRepeated = false;//for keeping track if the array pattern has repeated, initialized to false
-	bool done = false;//for keeping track if production is finished, intialized to false
+	bool done = false;//for keeping track if production is finished, initialized to false
 	bool firstTime = true;//for keeping track if this is the first time a new generation has been attempted, initialized to true
+	char* spare_p; //creates spare pointer
 
 	for(int gensDone = 0; !done && (gensDone<gens); gensDone++)//Loops through each generation until max number of generations is reached
 	{
@@ -350,6 +352,8 @@ int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* 
 			puts("All organisms dead.");
 			printThis(nRows, nCols, old_p);
 		}
+		PlayOne(nRows, nCols, old_p, new_p);//play a new generation and increase the generation number
+		g++;
 		if (sameContent(old_p, new_p, nRows, nCols))//if the current array is the same as the previous array, end game and let user know
 		{
 			patternRepeated = true;
@@ -363,7 +367,7 @@ int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* 
 		}
 		else//all other cases
 		{
-			if (sameContent(old_p, other_p, nRows, nCols))//if the current array is same as 2 previous array, end game and let user know
+			if (sameContent(new_p, other_p, nRows, nCols))//if the current array is same as 2 previous array, end game and let user know
 			{
 				patternRepeated = true;
 				puts("Pattern repeated after two generations.");
@@ -385,10 +389,12 @@ int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* 
 				getc(stdin);//just waits for user input
 			}
 
-			other_p = old_p;//set pointer of spare array to point at old array
-			old_p = new_p;//set pointer of old array to point at spare array
-			PlayOne(nRows, nCols, old_p, new_p);//play a new generation and increase the generation number
-			g++;
+			//musical pointers
+			spare_p = other_p;
+			other_p = old_p;
+			old_p = new_p;
+			new_p = spare_p;
+
 
 		}
 
