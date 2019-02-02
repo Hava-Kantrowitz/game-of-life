@@ -55,7 +55,7 @@ bool tests(void)
 	//if(ok17)puts("Same content array is ok.");
 	bool ok18 = testSameContentDifferentArrays();
 	//if(ok18)puts("Different content is ok.");
-	puts("END OF TESTS.");
+	puts("END OF TESTS. SEE TESTS.C FOR LIST OF PASSING TESTS.");
 	results = ok1 && ok2 && ok3 && ok4 && ok5 && ok6 && ok7 && ok8 && ok9 && ok10 && ok11 && ok12 && ok13
 			&& ok14 && ok15 && ok16 && ok17 && ok18;
 	printf("tests returning %d.\n",results);

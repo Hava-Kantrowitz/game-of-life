@@ -126,6 +126,13 @@ bool production(int argc, char* argv[])
 			puts("Cannot find that file");
 			done = true;
 		}
+
+		//If the number of columns and/or rows in the file is greater than the gameboard array, let user know and end production
+		if (maximumWidth > nCols || howManyLinesInFile > nRows){
+			usage();
+			done = true; //set done to true, finishing production
+		}
+
 		if(!done)//if production hasn't ended, fill arrays
 		{
 			char A[nRows][nCols];//old array
@@ -153,6 +160,7 @@ bool production(int argc, char* argv[])
 			printThis(nRows, nCols, old_p);
 			//determine the total number of generations ran before completion
 			int howManyGens = generate(gens,  nRows,  nCols,  old_p, new_p, other_p, print, pause);
+			howManyGens--;//decrement gens ended on to adjust for starting on the 0th gen
 			printf("Ran %d generations\n", howManyGens);//let user know the number of gens
 		}
 
@@ -375,7 +383,7 @@ int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* 
 	bool firstTime = true;//for keeping track if this is the first time a new generation has been attempted, initialized to true
 	char* spare_p; //creates spare pointer
 
-	for(int gensDone = 0; !done && (gensDone<=gens); gensDone++)//Loops through each generation until max number of generations is reached
+	for(int gensDone = 0; !done && (gensDone<gens); gensDone++)//Loops through each generation until max number of generations is reached
 	{
 		if(!anyX(old_p, nRows, nCols))//if no cells have an x, all organisms are dead, end game and let user know
 		{
@@ -387,7 +395,8 @@ int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* 
 		}
 		PlayOne(nRows, nCols, old_p, new_p);//play a new generation and increase the generation number
 		g++;
-		if (sameContent(old_p, new_p, nRows, nCols))//if the current array is the same as the previous array, end game and let user know
+		//if the current array is the same as the previous array and game hasn't already ended, end game and let user know
+		if (!done && sameContent(old_p, new_p, nRows, nCols))
 		{
 			patternRepeated = true;
 			done = true;
@@ -401,7 +410,8 @@ int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* 
 		}
 		else//all other cases
 		{
-			if (sameContent(new_p, other_p, nRows, nCols))//if the current array is same as 2 previous array, end game and let user know
+			//if the current array is same as 2 previous array and game hasn't ended, end game and let user know
+			if (!done && sameContent(new_p, other_p, nRows, nCols))
 			{
 				patternRepeated = true;
 				puts("Pattern repeated after two generations.");
@@ -415,7 +425,7 @@ int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* 
 		{
 			if(print=='y')//if user wants it to print, print the generation
 			{
-				puts("New generation");
+				printf("New generation. Generation number %d.\n",gensDone+1);
 				printThis(nRows, nCols, new_p);
 			}
 			if(pause=='y')//if user wants a pause, pause and wait for input
@@ -430,17 +440,16 @@ int generate(int gens,  int nRows,  int nCols,  char* old_p, char* new_p, char* 
 			old_p = new_p;
 			new_p = spare_p;
 
-			//If end of user given gens is reached, decrement the gen number, let user know, and print array
-			if (gensDone == gens){
-				g--;
-				puts("Pattern terminated after user-specified generations.");
-				puts("Final pattern is:");
-				printThis(nRows, nCols, old_p);
-			}
-
 		}
 
+	}
 
+	//If repeated pattern and organisms dead are false, it must have ended due to user-specified max gens
+	//Let user know terminating condition and print array
+	if (!patternRepeated && !allOrganismsDead){
+		puts("Pattern terminated after user-specified generations.");
+		puts("Final pattern is:");
+		printThis(nRows, nCols, old_p);
 	}
 
 	return g;//return total number of generations

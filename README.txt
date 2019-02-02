@@ -27,6 +27,9 @@ print: 'y' to print the board after each generation, 'n' otherwise
 pause: 'y' to wait for user input to continue after each generation, 'n' otherwise
 Print and pause default to 'n' if not provided by the user
 
+When using keystroke to move forward during a pause, use the enter key.
+Initial user input is considered generation zero. 
+
 All values outside of the board size specified by the user default to unoccupied. Any generation that would extend off the board is truncated; only values on the given board are calculated and communicated to the user. 
 
 Starter code provide by Professor Smith. 
