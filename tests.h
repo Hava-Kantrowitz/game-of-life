@@ -11,22 +11,12 @@
  bool tests(void);
  bool testReadInput(void);
  bool testMakeArrays(void);
- bool testPlayOneSteadyState(void);
- bool testPlayOneBlinker(void);
- bool testPlayOneToad(void);
- bool testEndDeadBoard(void);
- bool testEndThreeGens(void);
- bool testEndOnePreviousGen(void);
- bool testEndOneGrandfatherGen(void);
- bool testGetLetterX(void);
- bool testGetLetterO(void);
- bool testNoNeighbors(void);
- bool testFourNeighbors(void);
- bool testEightNeighbors(void);
- bool testAnyXArrayOccupied(void);
- bool testAnyXArrayEmpty(void);
- bool testSameContentSameArrays(void);
- bool testSameContentDifferentArrays(void);
+ bool testPlayOne(void);
+ bool testGenerate(void);
+ bool testGetLetter(void);
+ bool testNeighbors(void);
+ bool testAnyX(void);
+ bool testSameContent(void);
 
 
 #endif /* TESTS_H_ */

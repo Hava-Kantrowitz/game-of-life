@@ -20,44 +20,23 @@ bool tests(void)
 	bool results=false;
 	puts("During tests");
 	bool ok1 = testReadInput();
-	//if(ok1)puts("Found and read the test file.");
+	if(ok1)puts("Found and read the test file.");
 	bool ok2 = testMakeArrays();
-	//if(ok2)puts("Was able to allocate the arrays ok.");
-	bool ok3 = testPlayOneSteadyState();
-	//if(ok3)puts("One generation, steady state, is ok.");
-	bool ok4 = testPlayOneBlinker();
-	//if(ok4)puts("Blinker one generation is ok.");
-	bool ok5 = testPlayOneToad();
-	//if(ok5)puts("Toad one generation is ok.");
-	bool ok6 = testEndThreeGens();
-	//if(ok6)puts("Termination after 3 generations is ok.");
-	bool ok7 = testEndOnePreviousGen();
-	//if(ok7)puts("Termination steady state is ok.");
-	bool ok8 = testEndOneGrandfatherGen();
-	//if(ok8)puts("Termination oscillating state is ok.");
-	bool ok9 = testGetLetterX();
-	//if(ok9)puts("Grab of x is ok.");
-	bool ok10 = testGetLetterO();
-	//if(ok10)puts("Grab of o is ok.");
-	bool ok11 = testNoNeighbors();
-	//if(ok11)puts("No neighbors is ok.");
-	bool ok12 = testFourNeighbors();
-	//if(ok12)puts("Four neighbors is ok.");
-	bool ok13 = testEightNeighbors();
-	//if(ok13)puts("All neighbors is ok.");
-	bool ok14 = testEndDeadBoard();
-	//if(ok14)puts("Termination of dead board is ok.");
-	bool ok15 = testAnyXArrayOccupied();
-	//if(ok15)puts("Occupied array is ok.");
-	bool ok16 = testAnyXArrayEmpty();
-	//if(ok16)puts("Empty array is ok.");
-	bool ok17 = testSameContentSameArrays();
-	//if(ok17)puts("Same content array is ok.");
-	bool ok18 = testSameContentDifferentArrays();
-	//if(ok18)puts("Different content is ok.");
-	puts("END OF TESTS. SEE TESTS.C FOR LIST OF PASSING TESTS.");
-	results = ok1 && ok2 && ok3 && ok4 && ok5 && ok6 && ok7 && ok8 && ok9 && ok10 && ok11 && ok12 && ok13
-			&& ok14 && ok15 && ok16 && ok17 && ok18;
+	if(ok2)puts("Was able to allocate the arrays ok.");
+	bool ok3 = testPlayOne();
+	if(ok3)puts("PlayOne is ok.");
+	bool ok4 = testGenerate();
+	if(ok4)puts("Generate is ok.");
+	bool ok5 = testGetLetter();
+	if(ok5)puts("Getting letter is ok.");
+	bool ok6 = testNeighbors();
+	if(ok6)puts("Finding neighbors is ok.");
+	bool ok7 = testAnyX();
+	if(ok7)puts("AnyX is ok.");
+	bool ok8 = testSameContent();
+	if(ok8)puts("Array comparison is ok.");
+	puts("END OF TESTS.");
+	results = ok1 && ok2 && ok3 && ok4 && ok5 && ok6 && ok7 && ok8;
 	printf("tests returning %d.\n",results);
 	return results;
 }
@@ -181,14 +160,17 @@ bool testMakeArrays(void)
 }
 
 /**
- * determines if the run of one stable generation works correctly
+ * determines if play one helper runs correctly
  * @return true if the test runs correctly, false otherwise
  */
-bool testPlayOneSteadyState(void)
+bool testPlayOne(void)
 {
 	bool results = false;//overall result of the test, initialized to false
-	bool ok1 = false;//result of test element 1, initialized to false
+	bool ok1 = false;//result of steady state test, initialized to false
+	bool ok2 = false;//result of blinker test, initialized to false
+	bool ok3 = false;//result of toad test, initialized to false
 
+	//steady state test
 	int nRows = 4;//set number of rows in test board to 4
 	int nCols = 3;//set number of columns in test board to 3
 	char boardBefore[4][3]={
@@ -218,109 +200,97 @@ bool testPlayOneSteadyState(void)
 
 		}
 	}
-	results = ok1;//set the overall results equal to the result of the first test element
-	return results;//return overall results
 
-}
-
-/**
- * tests that an unstable configuration of a blinker runs correctly
- * @return true if it runs correctly, false otherwise
- */
-bool testPlayOneBlinker(void){
-	bool results = false;//overall result of the test, initialized to false
-	bool ok1 = false;//result of test element 1, initialized to false
-
-	int nRows = 4;//set number of rows in test board to 4
-	int nCols = 3;//set number of columns in test board to 3
-	char boardBefore[4][3]={
+	//blinker test
+	char boardBefore2[4][3]={
 			{'o','o','o'},
 			{'o','x','o'},
 			{'o','x','o'},
 			{'o','x','o'}
 	};//initialize the board before a generation is played
 
-	char correctBoardAfter[4][3]={
+	char correctBoardAfter2[4][3]={
 			{'o','o','o'},
 			{'o','o','o'},
 			{'x','x','x'},
 			{'o','o','o'}
 	};//create board that should be the result of generation, to test created board against
 
-	char boardAfter[nRows][nCols];//create the board that the new generation will write into
+	char boardAfter2[nRows][nCols];//create the board that the new generation will write into
 
 	//here's the invocation
-	PlayOne(nRows, nCols, (char*)boardBefore, (char*)boardAfter);
+	PlayOne(nRows, nCols, (char*)boardBefore2, (char*)boardAfter2);
 	//here's the check
-	ok1 = true; //no errors found yet
+	ok2 = true; //no errors found yet
 	//loop through every row and column, checking to see if the created board and correct board
 	for(int row=0;row<nRows;row++)
 	{
 		for(int col=0; col<nCols; col++)
 		{
-			if(boardAfter[row][col]!=correctBoardAfter[row][col])
-				//if a discrepancy is found, set test element 1 to false and let user know where issue occurred
+			if(boardAfter2[row][col]!=correctBoardAfter2[row][col])
+				//if a discrepancy is found, set test false and let user know where issue occurred
 			{
-				ok1 = false;
+				ok2 = false;
 				printf("error found: %c does not equal %c. Row is %d, column is %d.\n", boardBefore[row][col], boardAfter[row][col], row, col);
 			}
 
 		}
 	}
-	results = ok1;//set the overall results equal to the result of the first test element
-	return results;//return overall results
-}
 
-/**
- * tests that an unstable configuration of a toad runs correctly
- * @return true if it runs correctly, false otherwise
- */
-bool testPlayOneToad(void){
-	bool results = false;//overall result of the test, initialized to false
-	bool ok1 = false;//result of test element 1, initialized to false
-
-	int nRows = 4;//set number of rows in test board to 4
-	int nCols = 4;//set number of columns in test board to 4
-	char boardBefore[4][4]={
+	//toad test
+	int nRows3 = 4;//set number of rows in test board to 4
+	int nCols3 = 4;//set number of columns in test board to 4
+	char boardBefore3[4][4]={
 			{'o','o','o','o'},
 			{'o','x','x','x'},
 			{'x','x','x','o'},
 			{'o','o','o','o'}
 	};//initialize the board before a generation is played
 
-	char correctBoardAfter[4][4]={
+	char correctBoardAfter3[4][4]={
 			{'o','o','x','o'},
 			{'x','o','o','x'},
 			{'x','o','o','x'},
 			{'o','x','o','o'}
 	};//create board that should be the result of generation, to test created board against
 
-	char boardAfter[nRows][nCols];//create the board that the new generation will write into
+	char boardAfter3[nRows3][nCols3];//create the board that the new generation will write into
 
 	//here's the invocation
-	PlayOne(nRows, nCols, (char*)boardBefore, (char*)boardAfter);
+	PlayOne(nRows3, nCols3, (char*)boardBefore3, (char*)boardAfter3);
 	//here's the check
-	ok1 = true; //no errors found yet
+	ok3 = true; //no errors found yet
 	//loop through every row and column, checking to see if the created board and correct board
-	for(int row=0;row<nRows;row++)
+	for(int row=0;row<nRows3;row++)
 	{
-		for(int col=0; col<nCols; col++)
+		for(int col=0; col<nCols3; col++)
 		{
-			if(boardAfter[row][col]!=correctBoardAfter[row][col])
+			if(boardAfter3[row][col]!=correctBoardAfter3[row][col])
 				//if a discrepancy is found, set test element 1 to false and let user know where issue occurred
 			{
-				ok1 = false;
-				printf("error found: %c does not equal %c. Row is %d, column is %d.\n", boardBefore[row][col], boardAfter[row][col], row, col);
+				ok3 = false;
+				printf("error found: %c does not equal %c. Row is %d, column is %d.\n", boardBefore3[row][col], boardAfter[row][col], row, col);
 			}
 
 		}
 	}
-	results = ok1;//set the overall results equal to the result of the first test element
+	results = ok1 && ok2 && ok3;//set the overall results equal to the result of all individual tests
 	return results;//return overall results
+
 }
 
-bool testEndDeadBoard(void){
-	bool results = false;//result of test, initialized to false
+/**
+ * tests generate function
+ * @return true if function works correctly, false otherwise
+ */
+bool testGenerate(void){
+	bool results = false;//result of overall test, initialized to false
+	bool ok1 = false;//result of dead board test, initialized to false
+	bool ok2 = false;//result of user specified end test, initialized to false
+	bool ok3 = false;//result of previous generation test, initialized to false
+	bool ok4 = false;//result of grandfather generation test, initialized to false
+
+	//dead board test
 
 	int gens = 3;//set number of generations to 3
 	int nRows = 2;//set number of rows to 2
@@ -347,27 +317,19 @@ bool testEndDeadBoard(void){
 	int numGens = generate(gens, nRows, nCols, firstGenBoard, emptyBoard1, emptyBoard2, print, pause);
 	//expected end after 1 generation
 	if (numGens == 1){//if the number of generations is the expected number, set results to true
-		results = true;
+		ok1 = true;
 	}
 	else{//otherwise let user know error occured, and how many generations actually ran
 		printf("%d generations occurred\n", numGens);
 	}
 
-	return results;//return the result of the tests
-}
+	//user specified test
 
-/**
- * tests game that ends at the user-specified number of generations
- * @return true if test runs successfully, false otherwise
- */
-bool testEndThreeGens(void){
-	bool results = false;//result of test, initialized to false
+	int gens2 = 3;//set number of generations to 3
+	int nRows2 = 6;//set number of rows to 6
+	int nCols2 = 6;//set number of columns to 6
 
-	int gens = 3;//set number of generations to 3
-	int nRows = 6;//set number of rows to 6
-	int nCols = 6;//set number of columns to 6
-
-	char emptyBoard1[6][6] = {
+	char emptyBoard1B[6][6] = {
 		{'o','o','o','o','o','o'},
 		{'o','o','o','o','o','o'},
 		{'o','o','o','o','o','o'},
@@ -376,7 +338,7 @@ bool testEndThreeGens(void){
 		{'o','o','o','o','o','o'},
 	};//empty board to initialize array a
 
-	char emptyBoard2[6][6] = {
+	char emptyBoard2B[6][6] = {
 		{'o','o','o','o','o','o'},
 		{'o','o','o','o','o','o'},
 		{'o','o','o','o','o','o'},
@@ -385,7 +347,7 @@ bool testEndThreeGens(void){
 		{'o','o','o','o','o','o'},
 	};//empty board to initialize array b
 
-	char firstGenBoard[6][6] = {
+	char firstGenBoardB[6][6] = {
 		{'o','o','x','o','o','o'},
 		{'o','o','o','x','o','o'},
 		{'o','x','x','x','o','o'},
@@ -394,74 +356,51 @@ bool testEndThreeGens(void){
 		{'o','o','o','o','o','o'},
 	};//first iteration of the board to initialize first generation of array
 
-	char print = 'n';//initialize print to no
-	char pause = 'n';//initialize pause to no
-
-	int numGens = generate(gens, nRows, nCols, firstGenBoard, emptyBoard1, emptyBoard2, print, pause);
+	int numGens2 = generate(gens2, nRows2, nCols2, firstGenBoardB, emptyBoard1B, emptyBoard2B, print, pause);
 	//expected end after 3 generations
-	if (numGens == 3){//if the number of generations is the expected number, set results to true
-		results = true;
+	if (numGens2 == 3){//if the number of generations is the expected number, set results to true
+		ok2 = true;
 	}
 	else{//otherwise let user know error occured, and how many generations actually ran
-		printf("%d generations occurred\n", numGens);
+		printf("%d generations occurred\n", numGens2);
 	}
+	//previous gen test
 
-	return results;//return the result of the tests
-}
+	int gens3 = 10;//number of max generations
+	int nRows3 = 2;//number of rows in array
+	int nCols3 = 2;//number of columns in array
 
-/**
- * tests game that ends due to one repeated generation
- * @return true if test runs successfully, false otherwise
- */
-bool testEndOnePreviousGen(void){
-	bool results = false;//result of test, initialized to false
-
-	int gens = 10;//number of max generations
-	int nRows = 2;//number of rows in array
-	int nCols = 2;//number of columns in array
-
-	char emptyBoard1[][2] = {
+	char emptyBoard1C[][2] = {
 		{'o','o'},
 		{'o','o'}
 	};//empty board to initialize array a
 
-	char emptyBoard2[][2] = {
+	char emptyBoard2C[][2] = {
 		{'o','o'},
 		{'o','o'}
 	};//empty board to initialize array b
 
-	char firstGenBoard[2][2] = {
+	char firstGenBoardC[2][2] = {
 		{'x','x'},
 		{'x','x'}
 	};//first iteration of the board to initialize first generation of array
 
-	char print = 'n';//initialize print to no
-	char pause = 'n';//initialize pause to no
-
-	int numGens = generate(gens, nRows, nCols, firstGenBoard, emptyBoard1, emptyBoard2, print, pause);
+	int numGens3 = generate(gens3, nRows3, nCols3, firstGenBoardC, emptyBoard1C, emptyBoard2C, print, pause);
 	//expected end after 1 generation
-	if (numGens == 1){//if the number of generations is the expected number, set results to true
-		results = true;
+	if (numGens3 == 1){//if the number of generations is the expected number, set results to true
+		ok3 = true;
 	}
 	else{//otherwise let user know error occured, and how many generations actually ran
-		printf("%d generations occurred\n", numGens);
+		printf("%d generations occurred\n", numGens3);
 	}
 
-	return results;//return the result of the tests
-}
+	//grandfather gen test
 
-/**
- * tests game that ends due to two repeated generations
- * @return true if test runs successfully, false otherwise
- */
-bool testEndOneGrandfatherGen(void){
-	bool results = false;//result of test, initialized to false
+	int gens4 = 10;//number of max generations
+	int nRows4 = 6;//number of rows in array
+	int nCols4 = 6;//number of columns in array
 
-	int gens = 10;//number of max generations
-	int nRows = 6;//number of rows in array
-	int nCols = 6;//number of columns in array
-
-	char emptyBoard1[6][6] = {
+	char emptyBoard1D[6][6] = {
 		{'o','o','o','o','o','o'},
 		{'o','o','o','o','o','o'},
 		{'o','o','o','o','o','o'},
@@ -470,7 +409,7 @@ bool testEndOneGrandfatherGen(void){
 		{'o','o','o','o','o','o'},
 	};//empty board to initialize array a
 
-	char emptyBoard2[6][6] = {
+	char emptyBoard2D[6][6] = {
 		{'o','o','o','o','o','o'},
 		{'o','o','o','o','o','o'},
 		{'o','o','o','o','o','o'},
@@ -479,7 +418,7 @@ bool testEndOneGrandfatherGen(void){
 		{'o','o','o','o','o','o'},
 	};//empty board to initialize array b
 
-	char firstGenBoard[6][6] = {
+	char firstGenBoardD[6][6] = {
 		{'o','o','o','o','o','o'},
 		{'o','o','x','o','o','o'},
 		{'o','o','x','o','o','o'},
@@ -488,26 +427,25 @@ bool testEndOneGrandfatherGen(void){
 		{'o','o','o','o','o','o'},
 	};//initialization of first iteration of board
 
-	char print = 'n';//initialize print to no
-	char pause = 'n';//initialize pause to no
-
-	int numGens = generate(gens, nRows, nCols, firstGenBoard, emptyBoard1, emptyBoard2, print, pause);
+	int numGens4 = generate(gens4, nRows4, nCols4, firstGenBoardD, emptyBoard1D, emptyBoard2D, print, pause);
 	//expected end after 2 generations
-	if (numGens == 2){//if the number of generations is the expected number, set results to true
-		results = true;
+	if (numGens4 == 2){//if the number of generations is the expected number, set results to true
+		ok4 = true;
 	}
 	else{//otherwise let user know error occured, and how many generations actually ran
-		printf("%d generations occurred\n", numGens);
+		printf("%d generations occurred\n", numGens4);
 	}
 
+	results = ok1 && ok2 && ok3 && ok4;//set overall result to results of individual test elements
 	return results;//return the result of the tests
 }
 
+
 /**
- * tests if functions grabs x correctly
+ * tests if functions grabs letter correctly
  * @return true if test works, false if test fails
  */
-bool testGetLetterX(void){
+bool testGetLetter(void){
 	bool results = false;//result of test, initialized to false
 
 	int row = 1;//row of cell
@@ -527,34 +465,15 @@ bool testGetLetterX(void){
 }
 
 /**
- * tests if function grabs o correctly
+ * tests if function counts number of neighbors correctly
  * @return true if test runs successfully, false otherwise
  */
-bool testGetLetterO(void){
-	bool results = false;//result of test, initialized to false
+bool testNeighbors(void){
+	bool results = false;//result of overall test, initialized to 0
+	bool ok1 = false;//test with no neighbors, initialized to 0
+	bool ok2 = false;//test with all neighbors, initialized to 0
 
-	int row = 0;//row of cell
-	int column = 1;//column of cell
-	int nCols = 2;//number of columns in array
-	char testArray[2][2] = {
-			{'x','o'},
-			{'x','x'}
-	};//array to test with
-
-	char letter = getLetter(row, column, nCols, testArray);
-	if (letter == 'o'){//if the letter is o, set results to true
-		results = true;
-	}
-
-	return results;//return the result of test
-}
-
-/**
- * tests if array without neighbors returns right number of neighbors
- * @return true if test runs successfully, false otherwise
- */
-bool testNoNeighbors(void){
-	bool results = false;//result of test, initialized to 0
+	//no neighbors
 
 	int row = 0;//row of cell to test
 	int column = 0;//row of column to test
@@ -567,68 +486,42 @@ bool testNoNeighbors(void){
 
 	int numNeighbors = HowManyNeighbors(row, column, nRows, nCols, testArray);
 	if (numNeighbors == 0){//if number of neighbors is 0, set results to true
-		results = true;
+		ok1 = true;
 	}
 
-	return results;//return result of tests
-}
+	//eight neighbors
 
-/**
- * tests if array with 4 neighbors returns right number of neighbors
- * @return true if test runs successfully, false otherwise
- */
-bool testFourNeighbors(void){
-	bool results = false;//result of test, initialized to 0
-
-	int row = 1;//row of cell to test
-	int column = 1;//row of column to test
-	int nRows = 3;//number of rows in array
-	int nCols = 3;//number of columns in array
-	char testArray[3][3]={
-		{'x','o','x'},
-		{'o','o','o'},
-		{'x','o','x'}
-	};//array to test
-
-	int numNeighbors = HowManyNeighbors(row, column, nRows, nCols, testArray);
-	if (numNeighbors == 4){//if the number of neighbors is 4, set results to true
-		results = true;
-	}
-
-	return results;//return result of test
-}
-
-/**
- * tests if array with 8 neighbors returns right number of neighbors
- * @return true if test runs successfully, false otherwise
- */
-bool testEightNeighbors(void){
-	bool results = false;//result of test, initialized to false
-
-	int row = 1;//row of cell to test
-	int column = 1;//column of cell to test
-	int nRows = 3;//number of rows in array
-	int nCols = 3;//number of columns in array
-	char testArray[3][3]={
+	int row2 = 1;//row of cell to test
+	int column2 = 1;//column of cell to test
+	int nRows2 = 3;//number of rows in array
+	int nCols2 = 3;//number of columns in array
+	char testArrayB[3][3]={
 		{'x','x','x'},
 		{'x','o','x'},
 		{'x','x','x'}
 	};//array to test
 
-	int numNeighbors = HowManyNeighbors(row, column, nRows, nCols, testArray);
-	if (numNeighbors == 8){//if array has 8 neighbors, set results to true
-		results = true;
+	int numNeighbors2 = HowManyNeighbors(row2, column2, nRows2, nCols2, testArrayB);
+	if (numNeighbors2 == 8){//if array has 8 neighbors, set results to true
+		ok2 = true;
 	}
 
+	results = ok1 && ok2;//set result of overall test to result of individual elements
 	return results;//return result of tests
 }
 
+
 /**
- * tests if array with at least once occupied cell returns anyX correctly
+ * tests if anyX function correctly determines if any cells are occupied
  * @return true if test runs successfully, false otherwise
  */
-bool testAnyXArrayOccupied(void){
-	bool results = false;//result of test, initialized to false
+bool testAnyX(void){
+	bool results = false;//result of overall test, initialized to false
+	bool ok1 = false;//array has an x in it, initialized to false
+	bool ok2 = false;//array does not have an x in it, initialized to false;
+
+	//test with x
+
 	int nRows = 2;//number of rows in array
 	int nCols = 2;//number of columns in array
 	char testArray[2][2]={
@@ -639,40 +532,36 @@ bool testAnyXArrayOccupied(void){
 	bool hasX = anyX(testArray, nRows, nCols);
 	//If any cell has an x in it, set results to true
 	if (hasX){
-		results = true;
+		ok1 = true;
 	}
 
-	return results;//return result of test
-}
-
-/**
- * tests if array with no occupied cells returns anyX correctly
- * @return true if test runs successfully, false otherwise
- */
-bool testAnyXArrayEmpty(void){
-	bool results = false;//result of test, initialized to false
-	int nRows = 2;//number of rows in array
-	int nCols = 2;//number of columns in array
-	char testArray[2][2]={
+	//test without x
+	char testArrayB[2][2]={
 		{'o','o'},
 		{'o','o'}
 	};//initializes test array
 
-	bool hasX = anyX(testArray, nRows, nCols);
+	bool hasX2 = anyX(testArrayB, nRows, nCols);
 	//If no cell is occupied, set results to true
-	if (!hasX){
-		results = true;
+	if (!hasX2){
+		ok2 = true;
 	}
 
+	results = ok1 && ok2;//sets result of overall test to results of individual tests
 	return results;//return result of test
 }
 
 /**
- * tests if two arrays are the same
+ * tests if sameContent function correctly determines if two arrays are the same
  * @return true if test runs successfully, false otherwise
  */
-bool testSameContentSameArrays(void){
-	bool results = false;//result of test, initialized to false
+bool testSameContent(void){
+	bool results = false;//result of overall test, initialized to false
+	bool ok1 = false;//test with arrays the same, initialized to false
+	bool ok2 = false;//test with arrays different, initialized to false
+
+	//same arrays
+
 	int nRows = 2;//number of rows in array
 	int nCols = 2;//number of columns in array
 	char testArray1[2][2]={
@@ -688,35 +577,26 @@ bool testSameContentSameArrays(void){
 	bool isSame = sameContent(testArray1, testArray2, nRows, nCols);
 	//if the arrays are the same, set result to true
 	if(isSame){
-		results = true;
+		ok1 = true;
 	}
 
-	return results;//return result of test
-}
-
-/**
- * tests if two arrays are the same
- * @return true if test runs successfully, false otherwise
- */
-bool testSameContentDifferentArrays(void){
-	bool results = false;//result of test, initialized to false
-	int nRows = 2;//number of rows in array
-	int nCols = 2;//number of columns in array
-	char testArray1[2][2]={
+	//different arrays
+	char testArray1B[2][2]={
 		{'o','o'},
 		{'x','x'}
 	};//initialization of first comparison array
 
-	char testArray2[2][2]={
+	char testArray2B[2][2]={
 		{'x','x'},
 		{'o','o'}
 	};//initialization of second comparison array
 
-	bool isSame = sameContent(testArray1, testArray2, nRows, nCols);
+	bool isSame2 = sameContent(testArray1B, testArray2B, nRows, nCols);
 	//if the arrays are different, set the result to true
-	if(!isSame){
-		results = true;
+	if(!isSame2){
+		ok2 = true;
 	}
 
+	results = ok1 && ok2;//set overall result to results of individual tests
 	return results;//return result of test
 }
